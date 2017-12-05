@@ -3,6 +3,7 @@ Simple SQL/Python script to dump sample MySQL data (adventureworks) to a JSON fo
 
 ## Usage
 Update mysql_json.py with valid connection credentials. 
-Then Simply run mysql_json.py 
-```python3 mysql_json.py
+Then, simply run mysql_json.py with a python3.X interpreter.
+```
+python3 mysql_json.py
 ```
