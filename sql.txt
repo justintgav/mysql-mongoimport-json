@@ -1,0 +1,27 @@
+SELECT h.PurchaseOrderID, h.RevisionNumber, 
+	(SELECT CASE h.Status WHEN 1 THEN "Pending" WHEN 2 THEN "Approved" WHEN 3 THEN "Rejected" WHEN 4 THEN "Complete" END) AS "Status", 
+    (SELECT CONCAT(c.FirstName, " ",c.LastName) FROM contact c JOIN employee e USING(ContactID) WHERE e.EmployeeID = h.EmployeeID) AS "Employee",
+    (SELECT json_object('VendorID', v.VendorID,'VendorName', v.Name, 'VendorAccount',v.AccountNumber) FROM vendor v WHERE v.VendorID = h.VendorID) AS "Vendor",
+    (SELECT json_object('ShipMethodID',s.ShipMethodID, 'ShipMethodName', s.Name,'ShipBase', s.ShipBase, 'ShipRate',s.ShipRate) FROM shipmethod s WHERE s.ShipMethodID= h.ShipMethodID) AS "ShipMethod",
+    h.OrderDate, h.ShipDate, h.SubTotal, h.TaxAmt, h.Freight, h.TotalDue, h.ModifiedDate,
+    (
+		SELECT json_array(
+			group_concat(DISTINCT
+				(SELECT json_object(
+						"Product", (SELECT json_object("ProductName", p.Name, "ProductNumber", p.ProductNumber) FROM product p WHERE p.ProductID = l.ProductID),
+                        "OrderQty", l.OrderQty,
+                        "ReceivedQty",l.ReceivedQty,
+                        "RejectedQty", l.RejectedQty,
+                        "StockedQty", l.StockedQty,
+                        "UnitPrice", l.UnitPrice,
+                        "LineTotal", l.LineTotal,
+                        "DueDate",l.DueDate,
+                        "ModifiedDate",l.ModifiedDate
+                        
+                        )
+				)
+    
+				)) 
+        FROM purchaseorderdetail l WHERE l.PurchaseOrderID = h.PurchaseOrderID
+	) AS "PurchaseOrderDetail"
+	FROM purchaseorderheader h LIMIT 10;

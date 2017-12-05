@@ -1,0 +1,1 @@
+mongoimport --db gavinj7 --collection PurchaseOrders --file out.txt --jsonArray
